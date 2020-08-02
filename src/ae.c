@@ -315,15 +315,18 @@ static int processTimeEvents(aeEventLoop *eventLoop) {
         long long id;
 
         /* Remove events scheduled for deletion. */
+        // 当判断该事件是一个定时事件后，使用finalizerProc函数对该事件进行处理
         if (te->id == AE_DELETED_EVENT_ID) {
             aeTimeEvent *next = te->next;
             /* If a reference exists for this timer event,
              * don't free it. This is currently incremented
              * for recursive timerProc calls */
+            // 该事件还被引用状态下，不进行删除
             if (te->refcount) {
                 te = next;
                 continue;
             }
+            // 事件引用为0，对该事件进行删除
             if (te->prev)
                 te->prev->next = te->next;
             else
